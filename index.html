@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<HEAD>
+    <TITle> Tres en rayas</TITle>
+
+</HEAD>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .winner {
+            font-size: 24px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .blue {
+            color: blue;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cells = document.querySelectorAll(".cell");
+            const winnerDisplay = document.querySelector(".winner");
+
+            function simulateGame() {
+                let currentPlayer = "X";
+                let gameBoard = ["", "", "", "", "", "", "", "", ""];
+                let moves = 0;
+
+                function checkWinner() {
+                    const winningCombinations = [
+                        [0, 1, 2],
+                        [3, 4, 5],
+                        [6, 7, 8],
+                        [0, 3, 6],
+                        [1, 4, 7],
+                        [2, 5, 8],
+                        [0, 4, 8],
+                        [2, 4, 6]
+                    ];
+
+                    for (const combo of winningCombinations) {
+                        const [a, b, c] = combo;
+                        if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+                            return gameBoard[a];
+                        }
+                    }
+
+                    if (gameBoard.every(cell => cell !== "")) {
+                        return "Tie";
+                    }
+
+                    return null;
+                }
+
+                function displayWinner(winner) {
+                    winnerDisplay.textContent = winner === "Tie" ? "Empate" : `${winner} ha ganado`;
+                    winnerDisplay.classList.add(winner === "X" ? "red" : "blue");
+
+                    setTimeout(() => {
+                        resetGame();
+                    }, 1000);
+                }
+
+                function resetGame() {
+                    gameBoard = ["", "", "", "", "", "", "", "", ""];
+                    winnerDisplay.textContent = "";
+                    winnerDisplay.classList.remove("red", "blue");
+
+                    cells.forEach(cell => {
+                        cell.textContent = "";
+                        cell.classList.remove("red", "blue");
+                    });
+
+                    simulateGame(); // reinicia automáticamente
+                }
+
+                function playRandomMove() {
+                    const emptyCells = gameBoard.reduce((acc, value, index) => {
+                        if (value === "") {
+                            acc.push(index);
+                        }
+                        return acc;
+                    }, []);
+
+                    if (emptyCells.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * emptyCells.length);
+                        const move = emptyCells[randomIndex];
+                        gameBoard[move] = currentPlayer;
+                        cells[move].textContent = currentPlayer;
+                        cells[move].classList.add(currentPlayer === "X" ? "red" : "blue");
+
+                        moves++;
+                        currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+                        const winner = checkWinner();
+                        if (winner) {
+                            displayWinner(winner);
+                        } else if (moves === 9) {
+                            displayWinner("Tie");
+                        } else {
+                            setTimeout(playRandomMove, 2000);
+                        }
+                    }
+                }
+
+                playRandomMove(); // inicia el juego automáticamente
+            }
+
+            simulateGame(); // llama a la simulación al cargar la página
+        });
+    </script>
+</head>
+
+<body>
+    <div class="board">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div>
+    <div class="winner"></div>
+</body>
+
+</html>
